@@ -1,0 +1,92 @@
+*{
+    margin: 0;
+    padding: 0;
+    border-radius: 10px;
+}
+
+body{
+    min-height: 100vh;
+}
+
+div{
+    display: block;
+}
+
+.post-title a{
+    text-decoration:none;
+    color: black;
+}
+
+.site-content{
+    background-color: rgba(255, 255, 255, 0.8);
+    max-width: 800px;
+    padding: 1% 10px;
+    margin-top: 1%;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100%;
+}
+
+.text-input{
+    font-size: 1.5rem;
+    padding: 12px 24px 12px 64px;
+    width: 80%;
+    outline: 0;
+    border-radius: 50px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+}
+
+.search-form{
+    text-align: center;
+    margin-top: 1%;
+}
+
+.post-item{
+    margin-bottom: 2%;
+    box-shadow: 0 1px 20px -8px rgba(0,0,0,.5);
+}
+.post-title{
+    font-weight: bold;
+    font-size: 1.17em;
+    text-align: center;
+}
+.post-text{
+    color: rgba(0,0,0,.66);
+}
+.post-info{
+    color: #888;
+    font-size: 12px;
+    text-align: center;
+}
+
+#content{
+    animation: main 1s;
+}
+@keyframes main {
+    0% {
+        opacity: 0;
+        transform: translateY(50px)
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
+.chinese-font {
+    font-family: 'Merriweather Sans',Helvetica,Tahoma,Arial,'PingFang SC','Hiragino Sans GB','Microsoft Yahei','WenQuanYi Micro Hei',sans-serif;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #eee;
+}
+::-webkit-scrollbar-thumb {
+    background: #fe9600;
+    background-color: #69d2e7;
+}
+::-webkit-scrollbar-track {
+    background-color: #eee;
+}

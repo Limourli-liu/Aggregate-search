@@ -1,0 +1,30 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    min-height: 100vh;
+    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+}
+
+.container{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+
+    width: 400px;
+    height: 240px;
+
+    background: linear-gradient(25deg,#0172b0,#88daf7);
+    box-shadow: 6px 6px 14px #01517d,inset 0 0 15px #88daf7;
+}
+
+.container h2,h4{
+    margin: 10px 0;
+    color: white;
+    text-align: center;
+    /* text-transform: uppercase; */
+
+}
