@@ -1,4 +1,4 @@
- #!/usr/bin/env python
+#!/usr/bin/env python3
 from flask import Flask, jsonify, render_template, request
 from ModManager import ModManager
 app = Flask(__name__)
