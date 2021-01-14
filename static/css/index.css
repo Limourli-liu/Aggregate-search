@@ -1,6 +1,6 @@
 *{
     margin: 0;
-    padding: 0;
+    padding: 1%;
     border-radius: 10px;
 }
 
@@ -25,6 +25,7 @@ div{
     margin-left: auto;
     margin-right: auto;
     height: 100%;
+    min-height: 100vh;
 }
 
 .text-input{
