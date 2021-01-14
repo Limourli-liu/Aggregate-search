@@ -11,10 +11,10 @@ def _path(name, root=None):
     p =  os.path.join(root or os.getcwd(), name)
     return (os.path.exists(p) or not os.makedirs(p)) and p
 def _rJson(path):
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         return json.load(f)
 def _wJson(path, data):
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 def _logDefault(path, name):
         config = {
