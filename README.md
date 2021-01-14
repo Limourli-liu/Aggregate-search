@@ -17,6 +17,6 @@
         <img alt="GitHub forks" src="https://img.shields.io/github/forks/Limourli-liu/Aggregate-search" style="max-width:100%;">
     </a>
     <a href="https://travis-ci.org/github/Limourli-liu/Aggregate-search" rel="nofollow">
-        <img alt="build status" src="https://travis-ci.org/Limourli-liu/Aggregate-search.svg?branch=master" style="max-width:100%;">
+        <img alt="build status" src="https://api.travis-ci.com/repos/Limourli-liu/Aggregate-search.svg?branch=master" style="max-width:100%;">
     </a>
 </p>
