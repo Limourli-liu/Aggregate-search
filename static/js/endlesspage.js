@@ -5,7 +5,7 @@ $(function () {
     function getData() {
         if (lock){return}
         lock = true
-        $.getJSON($SCRIPT_ROOT + "/api/info", {pid: pid}, function (data, status) {
+        $.getJSON($SCRIPT_ROOT + $SCRIPT_API, {pid: pid, ls: $SCRIPT_LS}, function (data, status) {
             if (status == "success" && data.length > 0){
                 pid++; //页码自动增加，保证下次调用时为新的一页。
                 lock = false

@@ -1,0 +1,5 @@
+baiduspider
+snownlp
+flask
+requests
+lxml

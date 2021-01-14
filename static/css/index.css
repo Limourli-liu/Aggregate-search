@@ -51,6 +51,7 @@ div{
     font-weight: bold;
     font-size: 1.17em;
     text-align: center;
+    background-color: #f8f8f8;
 }
 .post-text{
     color: rgba(0,0,0,.66);

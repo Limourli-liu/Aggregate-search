@@ -1,0 +1,9 @@
+{
+    "modInformation": {
+        "Name": "Search by Baidu",
+        "Author": "Limour @limour.top",
+        "Version": "1.0",
+        "description": "获取百度的搜索结果"
+    },
+    "Contab_Interval": 0
+}

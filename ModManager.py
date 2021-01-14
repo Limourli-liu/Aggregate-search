@@ -166,6 +166,9 @@ class ModManager(object):
         self.contab_t.start()
         self.logger.debug(f'ModManager contab.start')
     def _contab(self):
+        if self.contab == {}:
+            self.logger.debug(f'ModManager nothing to do contab.exit')
+            return
         while self.contab_c: #主线程控制信号， True继续
             slp = 60.0 - next(self.interval)
             self.logger.debug(f'ModManager contab.sleep time {slp}')
