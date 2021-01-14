@@ -28,3 +28,13 @@ pip3 install -r requirements.txt
 python3 ./AgSearch.py
 ```
 访问http://127.0.0.1:2021
+```java
+public void startThreadUseRunnalbe() {
+Thread thread = new Thread(new Runnable() {
+public void run() {
+System.out.println("start thread using runnable");
+}
+});
+thread.start();
+}
+```
