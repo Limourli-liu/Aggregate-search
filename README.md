@@ -18,13 +18,14 @@
     </a>
 </p>
 <h2 align="center">安装</h2>
-<code class="bash hljs">
+<pre class="bash hljs">
 git clone https://github.com/Limourli-liu/Aggregate-search.git
 cd Aggregate-search/
 pip3 install -r requirements.txt
-</code>
+</pre>
 <h2 align="center">使用</h2>
-<code class="bash hljs">
+<pre class="bash hljs">
 python3 ./AgSearch.py
-</code>
+</pre>
+
 访问http://127.0.0.1:2021
