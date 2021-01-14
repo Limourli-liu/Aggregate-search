@@ -29,4 +29,4 @@ def results():
     s = request.args.get('s')
     return render_template('index.html', url_api='/api/search', url_ls=s)
 
-app.run(port=2021)
+app.run(host='0.0.0.0', port=2021)
