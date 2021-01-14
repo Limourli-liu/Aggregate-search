@@ -18,23 +18,13 @@
     </a>
 </p>
 <h2 align="center">安装</h2>
-```bash
+<code class="bash hljs">
 git clone https://github.com/Limourli-liu/Aggregate-search.git
 cd Aggregate-search/
 pip3 install -r requirements.txt
-```
+</code>
 <h2 align="center">使用</h2>
-```bash
+<code class="bash hljs">
 python3 ./AgSearch.py
-```
+</code>
 访问http://127.0.0.1:2021
-```java
-public void startThreadUseRunnalbe() {
-Thread thread = new Thread(new Runnable() {
-public void run() {
-System.out.println("start thread using runnable");
-}
-});
-thread.start();
-}
-```
