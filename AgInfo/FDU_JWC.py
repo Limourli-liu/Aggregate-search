@@ -1,7 +1,7 @@
 import requests, traceback, threading
 from lxml import etree
 try:
-    from pubilc.summary import getSummary
+    from public.summary import getSummary
 except:
     import os, sys
     sys.path.append("..")

@@ -1,7 +1,7 @@
 import traceback, requests
 from lxml import etree
 try:
-    from pubilc.baiduspider import BaiduSpider
+    from public.baiduspider import BaiduSpider
 except:
     import os, sys
     sys.path.append("..")
