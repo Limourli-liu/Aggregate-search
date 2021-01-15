@@ -1,0 +1,25 @@
+{
+    "modInformation": {
+        "Name": "Search by Google",
+        "Author": "Limour @limour.top",
+        "Version": "1.0",
+        "description": "获取谷歌的搜索结果"
+    },
+    "Contab_Interval": 0,
+    "proxies": {
+        "http": "http://127.0.0.1:1080",
+        "https": "http://127.0.0.1:1080"
+    },
+    "headers": {
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+        "cache-control": "max-age=0",
+        "cookie": "CGIC=Inx0ZXh0L2h0bWwsYXBwbGljYXRpb24veGh0bWwreG1sLGFwcGxpY2F0aW9uL3htbDtxPTAuOSxpbWFnZS93ZWJwLGltYWdlL2FwbmcsKi8qO3E9MC44LGFwcGxpY2F0aW9uL3NpZ25lZC1leGNoYW5nZTt2PWIzO3E9MC45; ISSW=1; CONSENT=YES+BD.en+201909; SEARCH_SAMESITE=CgQIuJEB; 1P_JAR=2021-01-15-11; NID=207=KtcdqWrufgx8QD-bqsQbaIuE3fz3Xd_cTA6uCxNrk1gMeybZGgGz97wQDRaGbacyu77_ihltvUkLW4V-eZPL-mjrpLvd723L4mbDx3ToCPxwHL5loYHrQVNu4sorcRcDWrELdZKyl9iVyDJHnr_aWBoGMHaLThkbgafn7eH99pR0mgfKVrtdd8U0dM9SEpL4MvRwsnvmMjAfNqc",
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1"
+    }
+}
