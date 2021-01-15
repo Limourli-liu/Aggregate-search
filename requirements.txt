@@ -1,5 +1,6 @@
-baiduspider
 snownlp
 flask
 requests
 lxml
+htmlmin
+bs4

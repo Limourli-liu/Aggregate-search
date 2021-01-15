@@ -1,6 +1,12 @@
 import requests
 from lxml import etree
-from baiduspider import BaiduSpider
+try:
+    from pubilc.baiduspider import BaiduSpider
+except:
+    import os, sys
+    sys.path.append("..")
+    sys.path.extend([os.path.join(root, name) for root, dirs, _ in os.walk("../") for name in dirs])
+    from baiduspider import BaiduSpider
 
 config, db, log, lock = 0,0,0,0  #保存宿主传递的环境 分别为配置文件， 数据库，日志，全局线程锁
 def _default_config(root, name): #返回默认配置文件 载入时被调用 root为数据文件根目录 name为当前模块名称
@@ -20,6 +26,14 @@ def _init(_config, _db, _log, _lock, m_name): #载入时被调用
     config, log, lock = _config, _log, _lock #保存宿主传递的环境
     global Baidu
     Baidu = BaiduSpider()
+    Baidu.headers['Cache-Control'] =  'no-cache'
+    Baidu.headers['Pragma'] =  'no-cache'
+    Baidu.headers['Sec-Fetch-Dest'] =  'document'
+    Baidu.headers['Sec-Fetch-Mode'] =  'navigate'
+    Baidu.headers['Sec-Fetch-Site'] =  'none'
+    Baidu.headers['Sec-Fetch-User'] =  '?1'
+    Baidu.headers['Upgrade-Insecure-Requests'] =  '1'
+    Baidu.headers['Cookie'] = 'BIDUPSID=CA16753CF20338F61EFF2308D75FD378; PSTM=1610690081; BAIDUID=CA16753CF20338F6B2F0E1BEB8012DB7:FG=1; delPer=0; BD_CK_SAM=1; PSINO=6; H_PS_PSSID=33425_33466_33358_33259_33344_31254_33286_33414_26350; BD_UPN=12314753; H_PS_645EC=7537lWQ5t2PgtXC38yxw3ryuLYY7rT9I4Etn%2F9E%2BnTSJosnALJXW66DITPs; BA_HECTOR=8g2180048laka020i61g02bh40r; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598'
 
 def _contab():
     pass
@@ -76,9 +90,30 @@ def _search(s, pid):
             d = f'引擎：Baidu 来源：百度百科'
             u = item['url']
             res.append((t, s, d, u))
+        elif item['type'] == 'tieba':
+            item = item['result']
+            t = item['title']
+            s = f'<div><img src="{item["cover"]}" style="height:85px"></img>{item["des"]}</div>'
+            d = f'引擎：Baidu 来源：贴吧 帖数：{item["total"]} 关注：{item["followers"]}'
+            u = item['url']
+            hot = ''
+            for x in item['hot']:
+                hot = f'{x["title"]}_{x["clicks"]}_{x["replies"]}' 
+                hot = f'<div><a href="{x["url"]}">{hot}</a></div>'
+                s += hot
+            res.append((t, s, d, u))
     return res
 
 if __name__ == '__main__':
     t = BaiduSpider()
-    a = t.search_web(query='弱音 百度百科', pn=1)
+    t.headers['Cache-Control'] =  'no-cache'
+    t.headers['Pragma'] =  'no-cache'
+    t.headers['Sec-Fetch-Dest'] =  'document'
+    t.headers['Sec-Fetch-Mode'] =  'navigate'
+    t.headers['Sec-Fetch-Site'] =  'none'
+    t.headers['Sec-Fetch-User'] =  '?1'
+    t.headers['Upgrade-Insecure-Requests'] =  '1'
+    t.headers['Cookie'] = 'BIDUPSID=CA16753CF20338F61EFF2308D75FD378; PSTM=1610690081; BAIDUID=CA16753CF20338F6B2F0E1BEB8012DB7:FG=1; delPer=0; BD_CK_SAM=1; PSINO=6; H_PS_PSSID=33425_33466_33358_33259_33344_31254_33286_33414_26350; BD_UPN=12314753; H_PS_645EC=7537lWQ5t2PgtXC38yxw3ryuLYY7rT9I4Etn%2F9E%2BnTSJosnALJXW66DITPs; BA_HECTOR=8g2180048laka020i61g02bh40r; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598'
+    #a = t.search_web(query='异度侵入', pn=1)
+    a = t.search_web(query='弱音吧', pn=1)
     
