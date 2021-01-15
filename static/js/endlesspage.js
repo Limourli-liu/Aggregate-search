@@ -41,14 +41,12 @@ $(function () {
         var pageH = $(document).height();
         var scrollT = getScrollTop(); //滚动条top
         var aa = (pageH - winH - scrollT) / winH;
-        if (aa < 0.02) {//0.02是个参数
+        if (aa < 0.1) {
             getData();
         }
-        //$(window).scroll(scrollHandler);
     }
     //定义鼠标滚动事件
-    window.addEventListener('scroll', scrollHandler);
-    //$(window).scroll(scrollHandler);
+    window.onscroll = scrollHandler
     //==============核心代码=============
 });
 
