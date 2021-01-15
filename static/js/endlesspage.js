@@ -5,16 +5,20 @@ $(function () {
     function getData() {
         if (lock){return}
         lock = true
-        $.getJSON($SCRIPT_ROOT + $SCRIPT_API, {pid: pid, ls: $SCRIPT_LS}, function (data, status) {
-            if (status == "success" && data.length > 0){
-                pid++; //页码自动增加，保证下次调用时为新的一页。
-                lock = false
-                insertDiv(data);
-            }
-            else{
-                lock = false
-            }
-        });
+        try{
+            $.getJSON($SCRIPT_ROOT + $SCRIPT_API, {pid: pid, ls: $SCRIPT_LS}, function (data, status) {
+                if (status == "success" && data.length > 0){
+                    pid++; //页码自动增加，保证下次调用时为新的一页。
+                    lock = false
+                    insertDiv(data);
+                }
+                else{
+                    lock = false
+                }
+            });
+        }catch(err){
+            lock = false
+        }
       }
     //生成数据html,append到div中
     function insertDiv(json) {
@@ -41,11 +45,12 @@ $(function () {
         var pageH = $(document).height();
         var scrollT = getScrollTop(); //滚动条top
         var aa = (pageH - winH - scrollT) / winH;
-        if (aa < 0.1) {
+        if (aa < 0.15) {
             getData();
         }
     }
     //定义鼠标滚动事件
+    lock = false
     window.onscroll = scrollHandler
     //==============核心代码=============
 });

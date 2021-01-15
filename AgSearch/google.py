@@ -60,7 +60,7 @@ def _showlxml(etr):
         for x in etr: _showlxml(x)
 
 def getHtml(s, pid):
-    url = f'https://www.google.com/search?q={s}&start={pid*10}'
+    url = f'https://www.google.com/search?lr=lang_zh&newwindow=1&safe=strict&tbs=lr:lang_1zh&q={s}&start={pid*10}'
     headers=config['headers']
     headers['user-agent'] = getUA()
     r = requests.get(url, headers=headers, proxies=config['proxies'], verify=False)
@@ -68,7 +68,7 @@ def getHtml(s, pid):
         log.debug('getHtml 网络错误')
         return
     r.encoding = 'utf-8'
-    html= etree.HTML(r.text)
+    html= etree.HTML(r.text.encode('utf-8'))
     return html
 
 def getUrl(text:str):
@@ -89,36 +89,64 @@ def getText(el:list):
     return '_'.join(res)
 
 def getR1(div):
-    url = div.xpath('./div/div/div/div/a/@href')
+    url = div.xpath('.//div/div/div/a/@href')
     if len(url) == 1: url = getUrl(url[0])
     else:
         log.debug('getR1 len(url)错误')
         url = ""
-    title = getText(div.xpath('./div/div/div/div/a//*/text()'))
-    des = getText(div.xpath('./div/div/div/div/table//*/text()'))
+    title = getText(div.xpath('.//div/div/div/a//*/text()'))
+    tmp = div.xpath('.//div/div/div/a/img')
+    if len(tmp) > 0:
+        title += etree.tostring(tmp[0], encoding="utf-8").decode("utf-8").strip()
+    des = getText(div.xpath('.//div/div/div/table//*/text()'))
     return url, title, des
 
 def isRes(div):
-    return len(div.xpath('./div/div/div/div/a')) == 1
+    return len(div.xpath('.//div/div/div/a')) == 1
+
+def _patch_isRes(div):
+    return len(div.xpath('./div/div/a')) == 1
+def _patch_getR1(div):
+    url = div.xpath('./div/div/a/@href')
+    if len(url) == 1: url = getUrl(url[0])
+    else:
+        log.debug('getR1 len(url)错误')
+        url = ""
+    title = getText(div.xpath('./div/div/a//*/text()'))
+    tmp = div.xpath('./div/div/a/img')
+    if len(tmp) > 0:
+        title += etree.tostring(tmp[0], encoding="utf-8").decode("utf-8").strip()
+    des = getText(div.xpath('.//div/div/div/div//*/text()'))
+    return url, title, des
+
 
 def getRes(html):
     try:
         html = html.xpath(r'.//body/div')[1]
     except IndexError:
-        log.error('getRes IndexError')
-        #_showlxml(html)
-        return []
+        html = html.xpath(r'.//div[@id="main"]')[0]
+        #_showlxml(html.xpath(r'.//body/div'))
+        # with open('./test/test.html', 'wb') as f:
+        #     f.write(etree.tostring(html, encoding="utf-8", pretty_print=True))
+        # return []
     html = html.xpath(r'./div')
-    res = [getR1(div) for div in html if isRes(div)]
+    res = []
+    for div in html:
+        if isRes(div):
+            res.append(getR1(div))
+        elif _patch_isRes(div):
+            res.append(_patch_getR1(div))
     return res
 
-def _search(s, pid):
+def _search(s:str, pid):
     #[(标题,内容,注释,URL)]
-    html = getHtml(s, pid)
+    html = getHtml(s.replace(' ','+'), pid)
     rl = getRes(html)
-    return [(t, d, '引擎：Google', u) for u,t,d in rl]
+    return [(t, d, '引擎：Google', u) for u,t,d in rl if u != '']
 
 if __name__ == '__main__':
-    config = _default_config('', '')
-    t = getHtml('为什么不出错', 0)
-    _showlxml(t)
+    # config = _default_config('', '')
+    # t = getHtml('为什么不出错', 0)
+    # _showlxml(t)
+    with open('../test/test.html', 'rb') as f:
+        t = etree.HTML(f.read())
