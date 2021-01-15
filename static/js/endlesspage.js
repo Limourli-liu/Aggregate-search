@@ -2,7 +2,7 @@
 var pid = 0; //设置当前页数，全局变量
 var lock = false //互斥锁
 $(function () {
-    function getData() {
+    async function getData() {
         if (lock){return}
         lock = true
         try{
