@@ -29,3 +29,6 @@ python3 ./AgSearch.py
 </pre>
 
 访问http://127.0.0.1:2021
+
+<h2 align="center">示例</h2>
+https://agsearch.frp.limour.top/
