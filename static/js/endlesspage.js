@@ -36,17 +36,19 @@ $(function () {
         var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;  
         return scrollTop;
     } 
-    var winH = $(window).height(); //页面可视区域高度
     var scrollHandler = function () {
+        var winH = $(window).height(); //页面可视区域高度
         var pageH = $(document).height();
         var scrollT = getScrollTop(); //滚动条top
         var aa = (pageH - winH - scrollT) / winH;
         if (aa < 0.02) {//0.02是个参数
             getData();
         }
+        //$(window).scroll(scrollHandler);
     }
     //定义鼠标滚动事件
-    $(window).scroll(scrollHandler);
+    window.addEventListener('scroll', scrollHandler);
+    //$(window).scroll(scrollHandler);
     //==============核心代码=============
 });
 
