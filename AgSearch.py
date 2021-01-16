@@ -4,9 +4,14 @@ from ModManager import ModManager
 app = Flask(__name__)
 
 def _extend(resl):
+    if not resl: return resl
+    resl.sort(key=len, reverse=True)
+    leh = tuple(map(len, resl))
     res = []
-    for item in resl:
-        res.extend(item)
+    for i in range(leh[0]):
+        for j,l in enumerate(leh):
+            if i < l: res.append(resl[j][i])
+            else: break
     return res
 AgInfo = ModManager('AgInfo')
 @app.route('/api/info')
