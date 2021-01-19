@@ -22,8 +22,8 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
         },
         'Contab_Interval': 0, #不用执行
         'proxies': {
-            'http':'http://127.0.0.1:1080', #http://user:password@host:port
-            'https':'http://127.0.0.1:1080'
+            'http':'http://127.0.0.1:10808', #http://user:password@host:port
+            'https':'http://127.0.0.1:10808'
         },
         'headers': {
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
