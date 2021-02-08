@@ -1,0 +1,9 @@
+{
+    "modInformation": {
+        "Name": "Example Mod",
+        "Author": "Limour @limour.top",
+        "Version": "1.0",
+        "description": "an example of mods"
+    },
+    "crontab_Interval": 2
+}

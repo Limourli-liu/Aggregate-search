@@ -12,5 +12,5 @@ def _exit():
     log.debug('exit')
     pass
 
-def _contab():
+def _crontab():
     pass

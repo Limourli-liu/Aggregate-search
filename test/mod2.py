@@ -11,5 +11,9 @@ def _init(_config, _db, _log, _lock, m_name): #载入时被调用
 def _exit():
     pass
 
-def _contab():
+def _crontab():
     pass
+
+def _test():
+    log.debug('_test')
+    return 2

@@ -1,5 +1,6 @@
 import pkgutil, sqlite3, json, traceback, os, threading, atexit, time
 import logging, logging.config
+from concurrent.futures import ThreadPoolExecutor
 
 def _interval():
     last = time.time()
@@ -16,6 +17,17 @@ def _rJson(path):
 def _wJson(path, data):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+def _format_exception(e, res):
+    if e.__context__ is not None:
+        _format_exception(e.__context__, res)
+        res.append('\n\nDuring handling of the above exception, another exception occurred:\n\n')
+    res.append('Traceback (most recent call last):\n')
+    res.extend(traceback.format_tb(e.__traceback__))
+    res.append(f'{repr(e)}')
+def format_exception(e):
+    res = []
+    _format_exception(e, res)
+    return ''.join(res)
 def _logDefault(path, name):
         config = {
         "version": 1,
@@ -63,6 +75,42 @@ class Config(dict):
         self.update(_getConf(self.path, Default))
     def save(self):
         _wJson(self.path, self)
+
+class Signal():
+    sig = True # 控制信号， True表示线程继续执行
+    state = False # 表明当前线程执行到哪一阶段
+    def __init__(self):
+        self._lock = threading.Lock() # 控制信号的锁
+    def _set(self, sig):
+        with self._lock:
+            self.sig = sig
+            return self.state
+    def __call__(self, state):
+        with self._lock:
+            self.state = state
+            return self.sig
+class Timer(object):
+    def __init__(self, _repeat, interval_scale = 60.0, _start=None):
+        self._repeat = _repeat # 需要循环定时执行的函数
+        self._i_scale = interval_scale # 时间间隔
+        self._s = _start # 进入循环前执行的函数
+        self.sig = Signal() # 交互控制信号
+        self.t = threading.Thread(target=self._exec, daemon=True)
+        self.t.start()
+    def _exec(self):
+        if self._s: self._s()
+        _itv = _interval() # 间隔计时器
+        while self.sig(False): # False表示可以中断的阶段
+            slp = self._i_scale - next(_itv) # 需要休眠的时间
+            if slp > 0: time.sleep(slp)
+            next(_itv) # 重新开始计时
+            if not self.sig(True): break # True表示需要等待的阶段
+            self._repeat()
+    def exit(self):
+        if self.sig._set(False): # 设置为退出状态，并获取线程执行阶段
+            self.t.join(self._i_scale+1) # 等待exec线程结束, 最多等interval_scale+1秒
+            return not self.t.is_alive() # 是否成功结束
+        return True
 
 class DB_Table(object):
     def __init__(self, name, cursor, lock):
@@ -116,7 +164,7 @@ class DataBase(object):
         return DB_Table(name, self.cursor, self.lock)
 
 class ModManager(object):
-    def __init__(self, name):
+    def __init__(self, name, max_workers=4):
         self.name = name
         self.root = _path(f'data/{name}')
         logConf = Config(self.root, 'logging', _logDefault(f'data/{name}/Mod.log', name))
@@ -158,42 +206,27 @@ class ModManager(object):
         self.logger.debug(f'ModManager plugins.init all done')
         self.plugins = plugins
         self.crontab = crontab
-        self.crontab_r = crontab.copy()
-        self.interval = _interval()
-        self.crontab_t = threading.Thread(target=self._crontab, daemon=True)
-        self.crontab_c = True #主线程控制信号， True表示子线程循环执行
-        self.crontab_w = False #不要求主线程等待，可以直接结束
-        self.crontab_t.start()
-        self.logger.debug(f'ModManager crontab.start')
+        if self.crontab: #存在定时项目
+            self.crontab_r = crontab.copy() #中间变量
+            self.timer = Timer(self._crontab)
+            self.logger.debug(f'ModManager crontab.start')
+        self.threadPool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix=f"{name}.")
     def _crontab(self):
-        if self.crontab == {}:
-            self.logger.debug(f'ModManager nothing to do crontab.exit')
-            return
-        while self.crontab_c: #主线程控制信号， True继续
-            slp = 60.0 - next(self.interval)
-            self.logger.debug(f'ModManager crontab.sleep time {slp}')
-            time.sleep(0 if slp < 0 else slp)
-            next(self.interval) #重新开始计时
-            for m_name,interval in self.crontab_r.items():
-                if not self.crontab_c: break #主线程控制信号， Fales退出
-                self.crontab_r[m_name] = interval - 1
-                if self.crontab_r[m_name] <= 0:
-                    self.crontab_r[m_name] = self.crontab[m_name] #执行一次后重置倒计时
-                    self.logger.debug(f'ModManager {m_name}.crontab')
-                    try:
-                        self.crontab_w = True #需要主线程等待，以防冲突
-                        self.plugins[m_name]._crontab()
-                    except:
-                        self.logger.error(f'ModManager {m_name}.crontab {traceback.format_exc()}')
-                    self.crontab_w = False #不需要主线程等待，可以直接结束
-        self.logger.debug(f'ModManager crontab.exit')
+        for m_name,interval in self.crontab_r.items():
+            self.crontab_r[m_name] = interval - 1
+            if self.crontab_r[m_name] <= 0:
+                self.crontab_r[m_name] = self.crontab[m_name] #执行一次后重置倒计时
+                self.logger.debug(f'ModManager {m_name}.crontab')
+                try:
+                    self.plugins[m_name]._crontab()
+                except:
+                    self.logger.error(f'ModManager {m_name}.crontab {traceback.format_exc()}')
     def _exit(self):
-        self.crontab_c = False
-        if self.crontab_w:
-            self.logger.debug(f'ModManager waiting crontab.exit')
-            self.crontab_t.join(61) #等待crontab线程结束, 最多等61秒
-        else:
-            self.logger.debug(f'ModManager not waiting crontab.exit')
+        self.threadPool.shutdown(wait=True)
+        self.logger.debug(f'ModManager threadPool.shutdown')
+        if self.crontab: #存在定时项目
+            tmp = self.timer.exit()
+            self.logger.debug(f'ModManager crontab.exit {tmp}')
         for  m_name,mod in self.plugins.items():
             self.logger.debug(f'ModManager {m_name}.exit')
             try:
@@ -206,24 +239,29 @@ class ModManager(object):
         self.logger.debug(f'ModManager.DataBase committed and closed')
         self.logger.debug(f'ModManager exit')
     def call(self, attr, *args, **kw):
-        res = []
+        res = {}
         for  m_name,mod in self.plugins.items():
             self.logger.debug(f'ModManager {m_name}.{attr}')
             try:
-                res.append(getattr(mod, attr)(*args, **kw))
+                future = self.threadPool.submit(getattr(mod, attr), *args, **kw)
+                res[m_name] = future
+            except:
+                self.logger.error(f'ModManager {m_name}.{attr} {traceback.format_exc()}')
+        self.logger.debug(f'ModManager plugins.{attr} have been added to threadPool')
+        resu = []
+        for  m_name,future in res.items():
+            try:
+                r = future.result()
+                excp = future.exception()
+                if excp is None:
+                    resu.append(r)
+                else:
+                    self.logger.error(f'ModManager {m_name}.{attr} {format_exception(excp)}')
             except:
                 self.logger.error(f'ModManager {m_name}.{attr} {traceback.format_exc()}')
         self.logger.debug(f'ModManager plugins.{attr} all done')
-        return res
+        return resu
 if __name__ == '__main__':
     test = ModManager('test')
-    #print(test.call('_test'))
+    print(test.call('_test'))
     #time.sleep(2*60+1) #保准示例的crontab执行一次
-    b = test.db
-    c = b.create('text2', 'id integer PRIMARY KEY autoincrement, Name varchar(30), Age integer, udate')
-    c.insert('age','1')
-    c.insert('age','2')
-    c.insert('age','3')
-    c.insert('age','4')
-    c.show()
-    d = c.select_('age', 'name is null')

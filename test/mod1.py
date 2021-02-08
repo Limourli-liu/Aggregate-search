@@ -8,7 +8,7 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
             'Version': '1.0',
             'description': 'an example of mods'
         },
-        'Contab_Interval': 2 #每2分钟执行一次_contab 粒度为1分钟
+        'crontab_Interval': 2 #每2分钟执行一次_crontab 粒度为1分钟
     }
 
 def _init(_config, _db, _log, _lock, m_name): #载入时被调用
@@ -21,12 +21,27 @@ def _exit():# 载入时被调用
     log.debug('exit')
     pass
 
-def _contab():# 定时调用，间隔在默认配置文件中设置
-    log.debug('contab')
-    # import time
-    # time.sleep(50)
+def _crontab():# 定时调用，间隔在默认配置文件中设置
+    log.debug('crontab')
+    import time
+    time.sleep(50)
     pass
+
+def c():
+    try:
+        int('xyz')
+    except:
+        1/0
+
+def b():
+    c()
+
+def a():
+    b()
+
 
 def _test():
     log.debug('_test')
+    a()
     return 1
+
