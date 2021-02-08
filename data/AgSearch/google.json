@@ -5,7 +5,7 @@
         "Version": "1.0",
         "description": "获取谷歌的搜索结果"
     },
-    "Contab_Interval": 0,
+    "crontab_Interval": 0,
     "proxies": {
         "http": "http://127.0.0.1:10808",
         "https": "http://127.0.0.1:10808"

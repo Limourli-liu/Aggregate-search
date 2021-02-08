@@ -20,7 +20,7 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
             'Version': '1.0',
             'description': '获取谷歌的搜索结果'
         },
-        'Contab_Interval': 0, #不用执行
+        'crontab_Interval': 0, #不用执行
         'proxies': {
             'http':'http://127.0.0.1:10808', #http://user:password@host:port
             'https':'http://127.0.0.1:10808'
@@ -43,7 +43,7 @@ def _init(_config, _db, _log, _lock, m_name): #载入时被调用
     global config, db, log, lock
     config, log, lock = _config, _log, _lock #保存宿主传递的环境
 
-def _contab():
+def _crontab():
     pass
 
 def _exit():

@@ -5,5 +5,5 @@
         "Version": "1.0",
         "description": "获取百度的搜索结果"
     },
-    "Contab_Interval": 0
+    "crontab_Interval": 0
 }

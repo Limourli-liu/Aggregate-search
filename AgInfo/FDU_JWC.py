@@ -64,14 +64,14 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
             'Version': '1.0',
             'description': '从复旦大学教务处官网获取最新通知'
         },
-        'Contab_Interval': 60 #每小时执行一次_contab 粒度为1分钟
+        'crontab_Interval': 60 #每小时执行一次_crontab 粒度为1分钟
     }
 
 def _init(_config, _db, _log, _lock, m_name): #载入时被调用
     global config, db, log, lock
     config, log, lock = _config, _log, _lock #保存宿主传递的环境
     db = _db.create(m_name, 'URL TEXT PRIMARY KEY, title varchar(255), abstract TEXT, udate') #创建新表或得到已创建的表
-    thd = threading.Thread(target=_contab) #初始更新一次
+    thd = threading.Thread(target=_crontab) #初始更新一次
     thd.start()
 
 def add_news(d,t,u):
@@ -84,7 +84,7 @@ def add_news(d,t,u):
 def _exit():
     pass
 
-def _contab():
+def _crontab():
     try:
         log.debug('update start')
         al = getList(1)

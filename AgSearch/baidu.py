@@ -17,7 +17,7 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
             'Version': '1.0',
             'description': '获取百度的搜索结果'
         },
-        'Contab_Interval': 0 #不用执行
+        'crontab_Interval': 0 #不用执行
     }
 
 Baidu = 0
@@ -35,7 +35,7 @@ def _init(_config, _db, _log, _lock, m_name): #载入时被调用
     Baidu.headers['Upgrade-Insecure-Requests'] =  '1'
     Baidu.headers['Cookie'] = 'BIDUPSID=CA16753CF20338F61EFF2308D75FD378; PSTM=1610690081; BAIDUID=CA16753CF20338F6B2F0E1BEB8012DB7:FG=1; delPer=0; BD_CK_SAM=1; PSINO=6; H_PS_PSSID=33425_33466_33358_33259_33344_31254_33286_33414_26350; BD_UPN=12314753; H_PS_645EC=7537lWQ5t2PgtXC38yxw3ryuLYY7rT9I4Etn%2F9E%2BnTSJosnALJXW66DITPs; BA_HECTOR=8g2180048laka020i61g02bh40r; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598'
 
-def _contab():
+def _crontab():
     pass
 
 def _exit():

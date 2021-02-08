@@ -139,7 +139,7 @@ class ModManager(object):
             except:
                 self.logger.error(f'ModManager load {m_name} {traceback.format_exc()}')
         self.logger.debug('ModManager plugins all loaded')
-        contab = {}
+        crontab = {}
         for m_name,mod in plugins.items():
             self.logger.debug(f'ModManager {m_name}.init')
             try:
@@ -150,50 +150,50 @@ class ModManager(object):
             try:
                 config = Config(self.root, m_name, default)
                 mod._init(config, self.db, logging.getLogger(f'{name}.{m_name}'), self.threading_lock, m_name)
-                interval = config.get('Contab_Interval', 0)
+                interval = config.get('crontab_Interval', 0)
                 if interval > 0: #加入定时执行池
-                    contab[m_name] = interval
+                    crontab[m_name] = interval
             except:
                 self.logger.error(f'ModManager {m_name}.init {traceback.format_exc()}')
         self.logger.debug(f'ModManager plugins.init all done')
         self.plugins = plugins
-        self.contab = contab
-        self.contab_r = contab.copy()
+        self.crontab = crontab
+        self.crontab_r = crontab.copy()
         self.interval = _interval()
-        self.contab_t = threading.Thread(target=self._contab, daemon=True)
-        self.contab_c = True #主线程控制信号， True表示子线程循环执行
-        self.contab_w = False #不要求主线程等待，可以直接结束
-        self.contab_t.start()
-        self.logger.debug(f'ModManager contab.start')
-    def _contab(self):
-        if self.contab == {}:
-            self.logger.debug(f'ModManager nothing to do contab.exit')
+        self.crontab_t = threading.Thread(target=self._crontab, daemon=True)
+        self.crontab_c = True #主线程控制信号， True表示子线程循环执行
+        self.crontab_w = False #不要求主线程等待，可以直接结束
+        self.crontab_t.start()
+        self.logger.debug(f'ModManager crontab.start')
+    def _crontab(self):
+        if self.crontab == {}:
+            self.logger.debug(f'ModManager nothing to do crontab.exit')
             return
-        while self.contab_c: #主线程控制信号， True继续
+        while self.crontab_c: #主线程控制信号， True继续
             slp = 60.0 - next(self.interval)
-            self.logger.debug(f'ModManager contab.sleep time {slp}')
+            self.logger.debug(f'ModManager crontab.sleep time {slp}')
             time.sleep(0 if slp < 0 else slp)
             next(self.interval) #重新开始计时
-            for m_name,interval in self.contab_r.items():
-                if not self.contab_c: break #主线程控制信号， Fales退出
-                self.contab_r[m_name] = interval - 1
-                if self.contab_r[m_name] <= 0:
-                    self.contab_r[m_name] = self.contab[m_name] #执行一次后重置倒计时
-                    self.logger.debug(f'ModManager {m_name}.contab')
+            for m_name,interval in self.crontab_r.items():
+                if not self.crontab_c: break #主线程控制信号， Fales退出
+                self.crontab_r[m_name] = interval - 1
+                if self.crontab_r[m_name] <= 0:
+                    self.crontab_r[m_name] = self.crontab[m_name] #执行一次后重置倒计时
+                    self.logger.debug(f'ModManager {m_name}.crontab')
                     try:
-                        self.contab_w = True #需要主线程等待，以防冲突
-                        self.plugins[m_name]._contab()
+                        self.crontab_w = True #需要主线程等待，以防冲突
+                        self.plugins[m_name]._crontab()
                     except:
-                        self.logger.error(f'ModManager {m_name}.contab {traceback.format_exc()}')
-                    self.contab_w = False #不需要主线程等待，可以直接结束
-        self.logger.debug(f'ModManager contab.exit')
+                        self.logger.error(f'ModManager {m_name}.crontab {traceback.format_exc()}')
+                    self.crontab_w = False #不需要主线程等待，可以直接结束
+        self.logger.debug(f'ModManager crontab.exit')
     def _exit(self):
-        self.contab_c = False
-        if self.contab_w:
-            self.logger.debug(f'ModManager waiting contab.exit')
-            self.contab_t.join(61) #等待contab线程结束, 最多等61秒
+        self.crontab_c = False
+        if self.crontab_w:
+            self.logger.debug(f'ModManager waiting crontab.exit')
+            self.crontab_t.join(61) #等待crontab线程结束, 最多等61秒
         else:
-            self.logger.debug(f'ModManager not waiting contab.exit')
+            self.logger.debug(f'ModManager not waiting crontab.exit')
         for  m_name,mod in self.plugins.items():
             self.logger.debug(f'ModManager {m_name}.exit')
             try:
@@ -218,7 +218,7 @@ class ModManager(object):
 if __name__ == '__main__':
     test = ModManager('test')
     #print(test.call('_test'))
-    #time.sleep(2*60+1) #保准示例的contab执行一次
+    #time.sleep(2*60+1) #保准示例的crontab执行一次
     b = test.db
     c = b.create('text2', 'id integer PRIMARY KEY autoincrement, Name varchar(30), Age integer, udate')
     c.insert('age','1')
