@@ -106,7 +106,7 @@ def _search(s, pid):
                 for video in item['results']:
                     t = video['title']
                     if video["cover"] is not None:
-                        s = f'<img src="{video["cover"]}" style="height:85px"></img>' + video['des']
+                        s = f'<img src="{video["cover"]}" style="height:85px"></img>'
                     else:
                         s = video['des']
                     d = f'引擎：Baidu 来源：{video["origin"]} 时长：{video["length"]}'
@@ -141,6 +141,26 @@ def _search(s, pid):
                     hot = f'{x["title"]}_{x["clicks"]}_{x["replies"]}' 
                     hot = f'<div><a href="{x["url"]}">{hot}</a></div>'
                     s += hot
+                res.append((t, s, d, u))
+            elif item['type'] == 'blog':
+                item = item['result']
+                t = item['title']
+                u = item['url']
+                d = f'引擎：Baidu 来源：博客'
+                s = ''
+                blogs = ''
+                for x in item['blogs']:
+                    bolgs = '_'.join(x['tags'])
+                    bolgs = f'{x["title"]}_{x["des"]}_{x["origin"]}_{bolgs}'
+                    bolgs = f'<div><a href="{x["url"]}">{bolgs}</a></div>'
+                    s += bolgs
+                res.append((t, s, d, u))
+            elif item['type'] == 'gitee':
+                item = item['result']
+                t = item['title']
+                u = item['url']
+                d = f'引擎：Baidu 来源：Gitee'
+                s = f'{item["des"]} {item["star"]}_{item["fork"]}_{item["watch"]}_{item["license"]}_{item["lang"]}_{item["status"]}'
                 res.append((t, s, d, u))
         except:
             log.error(traceback.format_exc())
