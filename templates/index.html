@@ -14,6 +14,8 @@
         <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
         <script type=text/javascript>$SCRIPT_ROOT = {{request.script_root|tojson|safe}};$SCRIPT_API = "{{url_api}}";$SCRIPT_LS = "{{url_ls}}";</script>
         <script type=text/javascript src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+        <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
     </head>
     <body style="background-image: url({{url_for('static', filename='img/star02.png')}});" class="chinese-font">
         <!--[if lt IE 7]>
