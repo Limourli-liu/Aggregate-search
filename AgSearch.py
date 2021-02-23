@@ -21,7 +21,7 @@ def info():
     return jsonify(_extend(resl))
 @app.route('/')
 def index():
-    return render_template('index.html', url_api='/api/info', url_ls='')
+    return render_template('index.html', url_api='/api/info', url_ls='', title='首页')
 
 AgSearch = ModManager('AgSearch')
 @app.route('/api/search')
@@ -33,6 +33,6 @@ def search():
 @app.route('/results')
 def results():
     s = request.args.get('s')
-    return render_template('index.html', url_api='/api/search', url_ls=s)
+    return render_template('index.html', url_api='/api/search', url_ls=s, title=s)
 
 app.run(host='0.0.0.0', port=2021)
