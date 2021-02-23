@@ -33,5 +33,8 @@ python3 ./AgSearch.py
 <h2 align="center">示例</h2>
 https://agsearch.frp.limour.top/
 
+<h2 align="center">目前接入的搜索引擎</h2>
+百度、Google、搜狗微信
+
 <h2 align="center">依赖</h2>
 感谢BaiduSpider项目的支持：https://github.com/BaiduSpider/BaiduSpider
