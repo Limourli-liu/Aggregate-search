@@ -1,4 +1,4 @@
-import traceback, requests
+import traceback, requests, re
 from lxml import etree
 try:
     from public.baiduspider import BaiduSpider
@@ -76,6 +76,10 @@ def _patch_tieba(tag):
     item['hot'] = hot
     return item
 
+_p_o = re.compile(r'\..+}')
+def _patch_origin(origin:str):
+    return _p_o.sub('', origin)
+
 def _search(s, pid):
     #[(标题,内容,注释,URL)]
     tmp = Baidu.search_web(query=s, pn=pid+1)
@@ -85,7 +89,7 @@ def _search(s, pid):
             if item['type'] == 'result':
                 t = item['title']
                 s = item['des']
-                d = f'引擎：Baidu 来源：{item["origin"]} 时间：{item["time"]}'
+                d = f'引擎：Baidu 来源：{_patch_origin(item["origin"])} 时间：{item["time"]}'
                 u = item['url']
                 res.append((t, s, d, u))
             elif item['type'] == 'calc':
@@ -99,7 +103,7 @@ def _search(s, pid):
                 for news in item['results']:
                     t = news['title']
                     s = news['des']
-                    d = f'引擎：Baidu 来源：{news["author"]} 时间：{news["time"]}'
+                    d = f'引擎：Baidu 来源：{_patch_origin(news["author"])} 时间：{news["time"]}'
                     u = news['url']
                     res.append((t, s, d, u))
             elif item['type'] == 'video':
@@ -109,7 +113,7 @@ def _search(s, pid):
                         s = f'<img src="{video["cover"]}" style="height:85px"></img>'
                     else:
                         s = video['des']
-                    d = f'引擎：Baidu 来源：{video["origin"]} 时长：{video["length"]}'
+                    d = f'引擎：Baidu 来源：{_patch_origin(video["origin"])} 时长：{video["length"]}'
                     u = video['url']
                     res.append((t, s, d, u))
             elif item['type'] == 'baike':
