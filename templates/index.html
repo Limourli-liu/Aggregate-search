@@ -8,21 +8,21 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>{{title}}-AgSearch</title>
-        <link rel="shortcut icon" href="{{url_for('static', filename='img/favicon.svg')}}" type="image/x-icon"/>
+        <link rel="shortcut icon" href="{{url_for('.static', filename='img/favicon.svg')}}" type="image/x-icon"/>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+        <link rel="stylesheet" href="{{url_for('.static', filename='css/index.css')}}">
         <script type=text/javascript>$SCRIPT_ROOT = {{request.script_root|tojson|safe}};$SCRIPT_API = "{{url_api}}";$SCRIPT_LS = "{{url_ls}}";</script>
-        <script type=text/javascript src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+        <script type=text/javascript src="{{url_for('.static', filename='js/jquery.min.js')}}"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
         <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
     </head>
-    <body style="background-image: url({{url_for('static', filename='img/star02.png')}});" class="chinese-font">
+    <body style="background-image: url({{url_for('.static', filename='img/star02.png')}});" class="chinese-font">
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <form class="search-form" action="results" method="get" role="search">
-            <input style="background:rgba(255,255,255,0.8) url({{url_for('static', filename='img/search.svg')}}) 2px 2px no-repeat; background-size: contain;" class="text-input" type="search" name="s" value="{{url_ls}}" placeholder="聚合搜索" required>
+            <input style="background:rgba(255,255,255,0.8) url({{url_for('.static', filename='img/search.svg')}}) 2px 2px no-repeat; background-size: contain;" class="text-input" type="search" name="s" value="{{url_ls}}" placeholder="聚合搜索" required>
         </form>
         <div id="content" class="site-content">
             <!--
@@ -33,6 +33,6 @@
             </article>
             -->
         </div>
-        <script type=text/javascript src="{{url_for('static', filename='js/endlesspage.js')}}" async defer></script>
+        <script type=text/javascript src="{{url_for('.static', filename='js/endlesspage.js')}}" async defer></script>
     </body>
 </html>

@@ -1,16 +1,33 @@
-from bs4 import BeautifulSoup
+import json
+from datetime import time, datetime
 
+import requests
 from baiduspider._spider import BaseSpider
 from baiduspider.util import handle_err
+from bs4 import BeautifulSoup, Comment
 
 
 class WebSubParser(BaseSpider):
+    """网页搜索子解析模块。
+
+    此模块为`BaiduSpider.search_web`函数的子模块，用于解析网页搜索子模块的HTML代码
+    并返回Python字典。
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.spider_name = "WebSubSpider"
 
     @handle_err
-    def parse_news_block(self, news: BeautifulSoup):
+    def parse_news_block(self, news: BeautifulSoup) -> dict:
+        """解析资讯子块
+
+        Args:
+            news (BeautifulSoup): 从源HTML代码中提取的资讯块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
         try:
             self._format(news.find("h3", class_="t").find("a").text)
         except:
@@ -41,7 +58,15 @@ class WebSubParser(BaseSpider):
         return news_detail
 
     @handle_err
-    def parse_video_block(self, video: BeautifulSoup):
+    def parse_video_block(self, video: BeautifulSoup) -> dict:
+        """解析视频子块
+
+        Args:
+            video (BeautifulSoup): 从源HTML代码中提取的视频块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
         if video:
             video_rows = video.findAll("div", class_="c-row")
             video_results = []
@@ -74,7 +99,15 @@ class WebSubParser(BaseSpider):
         return video_results
 
     @handle_err
-    def parse_baike_block(self, baike: BeautifulSoup):
+    def parse_baike_block(self, baike: BeautifulSoup) -> dict:
+        """解析百科子块
+
+        Args:
+            baike (BeautifulSoup): 从源HTML代码中提取的百科块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
         if baike:
             b_title = self._format(baike.find("h3").text)
             b_url = baike.find("a")["href"]
@@ -84,11 +117,15 @@ class WebSubParser(BaseSpider):
                 b_cover_type = "image"
             except (TypeError, AttributeError):
                 try:
-                    b_cover = baike.find("video", class_="op-bk-polysemy-video")[
-                        "data-src"
-                    ]
+                    b_cover = (
+                        baike.find("div", class_="op-bk-polysemy-imgWrap")
+                        .find("div", class_="c-img")["style"]
+                        .split("url", 1)[-1]
+                        .split(")", 1)[0]
+                        .strip("(")
+                    )
                     b_cover_type = "video"
-                except TypeError:
+                except (TypeError):
                     b_cover = None
                     b_cover_type = None
             baike = {
@@ -101,7 +138,15 @@ class WebSubParser(BaseSpider):
         return baike
 
     @handle_err
-    def parse_tieba_block(self, tieba: BeautifulSoup):
+    def parse_tieba_block(self, tieba: BeautifulSoup) -> dict:
+        """解析贴吧子块
+
+        Args:
+            tieba (BeautifulSoup): 从源HTML代码中提取的贴吧块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
         if tieba:
             t_title = self._format(tieba.find("h3").text)
             t_url = tieba["mu"]
@@ -158,7 +203,15 @@ class WebSubParser(BaseSpider):
         return tieba
 
     @handle_err
-    def parse_blog_block(self, blog: BeautifulSoup):
+    def parse_blog_block(self, blog: BeautifulSoup) -> dict:
+        """解析博客子块
+
+        Args:
+            blog (BeautifulSoup): 从源HTML代码中提取的博客块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
         if blog is not None:
             blog = blog.find("section")
             b_title = blog.find("h3", class_="c-title").text
@@ -196,7 +249,15 @@ class WebSubParser(BaseSpider):
         return blog
 
     @handle_err
-    def parse_gitee_block(self, gitee: BeautifulSoup):
+    def parse_gitee_block(self, gitee: BeautifulSoup) -> dict:
+        """解析Gitee仓库子块
+
+        Args:
+            gitee (BeautifulSoup): 从源HTML代码中提取的码云仓库块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
         if gitee is not None:
             g_title = gitee.find("h3", class_="c-title").text
             g_url = gitee.find("a", class_="c-blocka")["href"]
@@ -235,3 +296,72 @@ class WebSubParser(BaseSpider):
                 "status": g_status,
             }
         return gitee
+
+    @handle_err
+    def parse_music_block(self, music: BeautifulSoup) -> dict:
+        """解析音乐子块
+
+        Args:
+            music (BeautifulSoup): 从源HTML代码中提取的音乐块BeautifulSoup对象
+
+        Returns:
+            dict: 解析后自动生成的Python结果字典对象
+        """
+        if music is not None:
+            # 从注释中获取结果JSON
+            music = json.loads(
+                music.find(text=lambda text: isinstance(text, Comment)).strip(
+                    "s-data: "
+                )
+            )
+            m_title = music["title"].replace("<em>", "").replace("</em>", "")  # 搜索结果标题
+            m_url = music["url"]  # 搜索结果链接
+            m_songs = []  # 搜索结果歌曲
+            for song in music["data"]["site"]:
+                # 歌手信息
+                s_singer = [
+                    {"url": i["singerUrl"], "name": i["singerName"]}
+                    for i in song["singer"]
+                ]
+                # 预处理歌曲发布时间
+                try:
+                    __ = song["publishTime"].split("-")
+                except KeyError:
+                    __ = None
+                # 预处理歌曲时长
+                _ = int(song["duration"])
+                # 歌曲信息
+                s_song = {
+                    "name": song["displaySongName"],  # 歌曲名称
+                    "url": song["songUrl"],  # 歌曲链接
+                    "poster": song["poster"],  # 歌曲海报图片链接
+                    "is_original": bool(int(song["isOriginal"])),  # 是否为原唱
+                    "pub_date": datetime(int(__[0]), int(__[1]), int(__[2]))
+                    if __ is not None
+                    else None,  # 歌曲发布时间
+                    "labels": [i["txt"] for i in song["labels"]],  # 歌曲标签
+                    "copyright": bool(int(song["copyRight"])),  # 歌曲是否有版权
+                    "site": song["sitePinyin"],  # 歌曲发布站点（拼音）
+                    "duration": time(
+                        hour=int(_ / 60 / 60), minute=int(_ / 60), second=int(_ % 60)
+                    ),  # 歌曲时长
+                    "other_sites": song["allWapPlayFile"],  # 歌曲其他网站链接
+                }
+                # 歌曲发布公司
+                try:
+                    s_song["pub_company"] = song["pubCompany"]
+                    if song["pubCompany"] == "null":
+                        s_song["pub_company"] = None
+                except KeyError:
+                    s_song["pub_company"] = None
+                # 歌曲专辑
+                try:
+                    s_album = {
+                        "url": song["album"]["albumUrl"],
+                        "name": song["album"]["albumName"],
+                    }
+                except KeyError:
+                    s_album = None
+                m_songs.append({"song": s_song, "singer": s_singer, "album": s_album})
+            music = {"title": m_title, "url": m_url, "songs": m_songs}
+        return music

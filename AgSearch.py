@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-from flask import Flask, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request
 from ModManager import ModManager
-app = Flask(__name__)
+app = Blueprint('agsearch', __name__, url_prefix='/',
+                template_folder='templates',
+                static_folder='static',
+                static_url_path='static'
+                )
 
 def _extend(resl):
     if not resl: return resl
@@ -13,26 +17,35 @@ def _extend(resl):
             if i < l: res.append(resl[j][i])
             else: break
     return res
-AgInfo = ModManager('AgInfo')
+
+Mod = ModManager('AgSearch')
+AgInfo = Mod.getCall("_info")
+AgSearch = Mod.getCall("_search")
+def _info(pid):
+    return _extend(Mod.Call(AgInfo, pid))
+def _search(s, pid):
+    return _extend(Mod.Call(AgSearch, s, pid))
+
 @app.route('/api/info')
 def info():
     pid = request.args.get('pid', 0, type=int)
-    resl = AgInfo.call('_info', pid)
-    return jsonify(_extend(resl))
+    resl = _info(pid)
+    return jsonify(resl)
 @app.route('/')
 def index():
     return render_template('index.html', url_api='/api/info', url_ls='', title='首页')
 
-AgSearch = ModManager('AgSearch')
 @app.route('/api/search')
 def search():
     s = request.args.get('ls')
     pid = request.args.get('pid', 0, type=int)
-    resl = AgSearch.call('_search', s, pid)
-    return jsonify(_extend(resl))
+    resl = _search(s, pid)
+    return jsonify(resl)
 @app.route('/results')
 def results():
     s = request.args.get('s')
     return render_template('index.html', url_api='/api/search', url_ls=s, title=s)
 
-app.run(host='0.0.0.0', port=2021)
+server = Mod.getMod("webserver")
+server.register_blueprint(app)
+server.wait()

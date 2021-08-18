@@ -3,7 +3,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from lxml import etree
 
-config, db, log, lock = 0,0,0,0  #保存宿主传递的环境 分别为配置文件， 数据库，日志，全局线程锁
+config, Manager, log, lock = 0,0,0,0  #保存宿主传递的环境 分别为配置文件， 模块管理器，日志，全局线程锁
 def _default_config(root, name): #返回默认配置文件 载入时被调用 root为数据文件根目录 name为当前模块名称
     return {
         'modInformation':{ #该模块的信息
@@ -31,9 +31,9 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
         }
     }
 
-def _init(_config, _db, _log, _lock, m_name): #载入时被调用
-    global config, db, log, lock
-    config, log, lock = _config, _log, _lock #保存宿主传递的环境
+def _init(m_name, _config, _Manager, _log): #载入时被调用
+    global config, Manager, log, lock
+    config, Manager, log, lock = _config, _Manager, _log, _Manager.threading_lock #保存宿主传递的环境
 
 def _crontab():
     pass

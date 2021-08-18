@@ -19,7 +19,7 @@
 </p>
 <h2 align="center">安装</h2>
 <pre class="bash hljs">
-git clone https://github.com/Limourli-liu/Aggregate-search.git
+git clone https://github.com/Limourli-liu/Aggregate-search.git --recursive --shallow-submodules --depth 1
 cd Aggregate-search/
 pip3 install -r requirements.txt
 </pre>

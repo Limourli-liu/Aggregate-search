@@ -1,9 +1,0 @@
-{
-    "modInformation": {
-        "Name": "Information from Fudan University JWC",
-        "Author": "Limour @limour.top",
-        "Version": "1.0",
-        "description": "从复旦大学教务处官网获取最新通知"
-    },
-    "crontab_Interval": 60
-}

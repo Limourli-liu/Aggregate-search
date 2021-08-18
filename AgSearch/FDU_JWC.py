@@ -55,7 +55,7 @@ def getAbstract(u):
     sumy = getSummary(text)
     return sumy
 
-config, db, log, lock = 0,0,0,0  #保存宿主传递的环境 分别为配置文件， 数据库，日志，全局线程锁
+config, Manager, log, lock = 0,0,0,0  #保存宿主传递的环境 分别为配置文件， 模块管理器，日志，全局线程锁
 def _default_config(root, name): #返回默认配置文件 载入时被调用 root为数据文件根目录 name为当前模块名称
     return {
         'modInformation':{ #该模块的信息
@@ -67,9 +67,12 @@ def _default_config(root, name): #返回默认配置文件 载入时被调用 ro
         'crontab_Interval': 60 #每小时执行一次_crontab 粒度为1分钟
     }
 
-def _init(_config, _db, _log, _lock, m_name): #载入时被调用
-    global config, db, log, lock
-    config, log, lock = _config, _log, _lock #保存宿主传递的环境
+def _init(m_name, _config, _Manager, _log): #载入时被调用
+    global config, Manager, log, lock
+    config, Manager, log, lock = _config, _Manager, _log, _Manager.threading_lock #保存宿主传递的环境
+    _db = Manager.getMod('database').db # 调用BaseMod database
+    Manager.getMod("crontab").submit(m_name, config["crontab_Interval"], _crontab) # 调用BaseMod crontab
+    global db
     db = _db.create(m_name, 'URL TEXT PRIMARY KEY, title varchar(255), abstract TEXT, udate') #创建新表或得到已创建的表
     thd = threading.Thread(target=_crontab) #初始更新一次
     thd.start()
